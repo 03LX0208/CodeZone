@@ -38,7 +38,7 @@ export default {
 
     const test = () => {
       $.ajax({
-        url: "http://localhost:3080/api/test/",
+        url: "https://gomoku.lxcode.xyz/api/test/",
         type: "get",
         data: {
           'a': a.value,
