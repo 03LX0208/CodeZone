@@ -33,7 +33,7 @@ export default {
     actions: {
         login(context, data) {
             $.ajax({
-                url: "http://localhost:3081/api/user/token/",
+                url: "https://gomoku.lxcode.xyz/api/user/token/",
                 type: "post",
                 data: {
                     username: data.username,
@@ -53,13 +53,12 @@ export default {
         },
         getInfo(context) {
             $.ajax({
-                url: "http://localhost:3081/api/user/info/",
+                url: "https://gomoku.lxcode.xyz/api/user/info/",
                 type: "get",
                 headers: {
                     Authorization: "Bearer " + context.state.token,
                 },
                 success(resp) {
-                    console.log(resp);
                     context.commit("updateUser", {
                         ...resp,
                         is_login: true,

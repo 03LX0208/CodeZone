@@ -16,7 +16,7 @@
         </ul>
         <ul class="navbar-nav">
           <li class="nav-item" v-if="$store.state.user.is_login === false">
-              <router-link  :to="{name: 'login'}" :class="(route_name !== 'login' && route_name !== 'register') ? 'nav-link' : 'nav-link active'" aria-current="page" href="#">登录</router-link>
+            <router-link  :to="{name: 'login'}" :class="(route_name !== 'login' && route_name !== 'register') ? 'nav-link' : 'nav-link active'" aria-current="page" href="#">登录</router-link>
           </li>
           <li class="nav-item dropdown" v-else>
             <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

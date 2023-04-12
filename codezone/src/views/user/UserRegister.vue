@@ -62,7 +62,7 @@ export default {
     // 登录事件
     const register = () => {
       $.ajax({
-        url: "http://localhost:3081/api/user/register/",
+        url: "https://gomoku.lxcode.xyz/api/user/register/",
         type: "post",
         data: {
           username: username.value,
