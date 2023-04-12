@@ -1,7 +1,7 @@
 <template>
   <NavBar/>
   <div>
-    Gomoku
+    user_home
   </div>
 </template>
 

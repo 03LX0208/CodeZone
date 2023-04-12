@@ -35,7 +35,7 @@
 
         <!-- Image Section -->
         <div class="w-1/2 shadow-2xl">
-          <img class="object-cover w-full h-screen hidden md:block" src="@/assets/images/background/register_bkg.jpg" alt="#">
+          <img class="object-cover w-full h-screen hidden md:block" src="https://codezone-1313033191.cos.ap-beijing.myqcloud.com/background/register_bkg.jpg" alt="#">
         </div>
       </div>
 
@@ -62,7 +62,7 @@ export default {
     // 登录事件
     const register = () => {
       $.ajax({
-        url: "https://gomoku.lxcode.xyz/api/user/register/",
+        url: "http://localhost:3081/api/user/register/",
         type: "post",
         data: {
           username: username.value,

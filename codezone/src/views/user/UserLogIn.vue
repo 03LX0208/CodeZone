@@ -29,7 +29,7 @@
 
     <!-- Image Section -->
     <div class="w-1/2 shadow-2xl">
-      <img class="object-cover w-full h-screen hidden md:block" src="@/assets/images/background/login_bkg.jpg" alt="#">
+      <img class="object-cover w-full h-screen hidden md:block" src="https://codezone-1313033191.cos.ap-beijing.myqcloud.com/background/login_bkg.jpg" alt="#">
     </div>
   </div>
 
@@ -39,9 +39,9 @@
 <script>
 import NavBar from "@/components/NavBar";
 import {ref} from 'vue';
-import $ from 'jquery';
 import {useMessage} from "naive-ui";
 import router from "@/router";
+import { useStore } from 'vuex';
 
 export default {
   components: {
@@ -51,27 +51,21 @@ export default {
     let username = ref(''); // 用户名
     let password = ref(''); // 密码
     const message = useMessage();
+    const store = useStore(); // 调用全局更新
 
     // 按钮触发登录事件
     const login = () => {
-      $.ajax({
-        url: "https://gomoku.lxcode.xyz/api/user/token/",
-        type: "post",
-        data: {
-          username: username.value,
-          password: password.value
-        },
-        success(resp) {
-          if (resp.error_message === "success") {
-            message.success("登录成功！", {
-              duration: 1200
-            });
-            setTimeout(()=> {
-              router.push({name: 'root'});
-            }, 1200);
-          } else {
-            message.error("账号或密码有误！");
-          }
+      store.dispatch("login", {
+        username: username.value,
+        password: password.value,
+        success() {
+          store.dispatch("getInfo");
+          message.success("登录成功！", {
+            duration: 1200
+          });
+          setTimeout(()=> {
+            router.push({name: 'root'});
+          }, 1200);
         },
         error() {
           message.error("账号或密码有误！");

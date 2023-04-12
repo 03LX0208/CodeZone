@@ -1,64 +1,32 @@
 <template>
   <NavBar/>
-  <div style="display: flex; bottom: 50%">
-    home
-    <n-button type="info" @click="test" style="">
-      后端给我算
-    </n-button>
-    <n-input
-        v-model:value="a"
-        type="textarea"
-        placeholder="a"
-    />
-    <div></div>
+  <div class="row">
+    <div class="col"></div>
+    <div class="col-6">
+      <div class="card">
+        <div class="card-body text-center" style="align-items: center">
+          下一步 痛苦前端之画一个五子棋 and 个人主页页面 头像上传
+        </div>
+      </div>
+    </div>
+    <div class="col"></div>
   </div>
-  <n-input
-      v-model:value="b"
-      type="textarea"
-      placeholder="b"
-  />
 </template>
 
 <script>
-import $ from 'jquery'
-import {NButton, NInput} from "naive-ui";
-import {ref} from 'vue'
 import NavBar from "@/components/NavBar";
 
 export default {
   components: {
-    NButton,
-    NInput,
     NavBar
   },
 
   setup() {
-    let a = ref(0);
-    let b = ref(0);
 
-    const test = () => {
-      $.ajax({
-        url: "https://gomoku.lxcode.xyz/api/test/",
-        type: "get",
-        data: {
-          'a': a.value,
-          'b': b.value,
-        },
-        success(resp) {
-          alert(resp);
-        }
-      });
-    };
-
-    return {
-      test,
-      a,
-      b,
-    }
   }
 }
 </script>
 
-<style>
+<style scoped>
 
 </style>

@@ -68,7 +68,7 @@ public class RegisterServiceImpl implements RegisterService {
         }
 
         String encodedPassword = passwordEncoder.encode(password);
-        User user = new User(null, username, encodedPassword);
+        User user = new User(null, username, encodedPassword, "https://codezone-1313033191.cos.ap-beijing.myqcloud.com/user/default_photo.webp"); // 默认头像
         userMapper.insert(user);
 
         map.put("error_message", "success");
