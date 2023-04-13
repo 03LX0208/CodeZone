@@ -1,16 +1,15 @@
 <template>
   <NavBar/>
-  <div class="row">
-    <div class="col"></div>
-    <div class="col-6">
-      <div class="card">
-        <div class="card-body text-center" style="align-items: center">
-          下一步 痛苦前端之画一个五子棋 and 个人主页页面 头像上传
-        </div>
+  <div class="container">
+    <div class="row">
+      <div class="col"></div>
+      <div class="col text-center">
+        个人主页 上传代码待实现
       </div>
+      <div class="col"></div>
     </div>
-    <div class="col"></div>
   </div>
+
 </template>
 
 <script>
