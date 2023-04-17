@@ -21,7 +21,7 @@ export default {
 <style scoped>
 #map {
   height: 93.9vh;
-  background: url("../assets/images/gomoku/background.jpg");
+  background: url("../../assets/images/gomoku/background.jpg");
 }
 
 </style>

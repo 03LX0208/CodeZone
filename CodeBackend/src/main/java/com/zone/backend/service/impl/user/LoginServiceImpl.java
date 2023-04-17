@@ -1,7 +1,6 @@
 package com.zone.backend.service.impl.user;
 
 import com.zone.backend.pojo.User;
-import com.zone.backend.service.impl.UserDetailsImpl;
 import com.zone.backend.service.user.LoginService;
 import com.zone.backend.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,6 @@
 package com.zone.backend.service.impl.user;
 
 import com.zone.backend.pojo.User;
-import com.zone.backend.service.impl.UserDetailsImpl;
 import com.zone.backend.service.user.GetUserInfoService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;

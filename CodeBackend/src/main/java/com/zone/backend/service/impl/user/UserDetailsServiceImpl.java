@@ -1,8 +1,9 @@
-package com.zone.backend.service.impl;
+package com.zone.backend.service.impl.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.zone.backend.mapper.UserMapper;
 import com.zone.backend.pojo.User;
+import com.zone.backend.service.impl.user.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

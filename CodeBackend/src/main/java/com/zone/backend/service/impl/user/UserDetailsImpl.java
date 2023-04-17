@@ -1,4 +1,4 @@
-package com.zone.backend.service.impl;
+package com.zone.backend.service.impl.user;
 
 import com.zone.backend.pojo.User;
 import lombok.AllArgsConstructor;

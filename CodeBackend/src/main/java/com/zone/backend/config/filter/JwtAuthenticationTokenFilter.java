@@ -2,7 +2,7 @@ package com.zone.backend.config.filter;
 
 import com.zone.backend.mapper.UserMapper;
 import com.zone.backend.pojo.User;
-import com.zone.backend.service.impl.UserDetailsImpl;
+import com.zone.backend.service.impl.user.UserDetailsImpl;
 import com.zone.backend.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import org.jetbrains.annotations.NotNull;

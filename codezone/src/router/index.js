@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '@/views/HomeView';
-import UserRegister from '@/views/user/UserRegister';
-import UserLogIn from '@/views/user/UserLogIn';
-import GameView from '@/views/GameView';
+import UserRegister from '@/views/user/account/UserRegister';
+import UserLogIn from '@/views/user/account/UserLogIn';
+import GomokuView from '@/views/game/GomokuView';
 import RecordView from '@/views/RecordView';
 import NotFound from "@/components/error_page/NotFound";
 import UserHome from "@/views/user/UserHome";
@@ -30,9 +30,9 @@ const routes = [
     component: UserLogIn
   },
   {
-    path: '/game',
-    name: 'game',
-    component: GameView
+    path: '/game/gomoku',
+    name: 'game_gomoku',
+    component: GomokuView
   },
   {
     path: '/record',
