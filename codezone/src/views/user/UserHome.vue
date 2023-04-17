@@ -7,7 +7,7 @@
           <n-card style="max-width: 250px; margin-top: 50px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
             <template #cover>
               <div class="d-flex justify-content-center" style="padding: 30px 50px 10px 50px">
-                <img style="max-width: 160px" :src="$store.state.user.photo">
+                <img style="max-width: 160px" :src="$store.state.user.photo" alt="#">
               </div>
             </template>
             <span style="font-family: si-yuan, sans-serif; font-size: 30px;"> {{ $store.state.user.username }} </span>
@@ -26,7 +26,42 @@
                 pane-style="padding: 20px;"
             >
               <n-tab-pane name="我的 bot">
-                还没写
+                <n-data-table
+                    :columns="columns"
+                    :data="allBots"
+                    :pagination="false"
+                    :bordered="false"
+                    :single-line="false"
+                    style="font-family: si-yuan, sans-serif; font-weight: 750; font-size: 15px;"
+                />
+                <n-modal v-model:show="showCodeModal">
+                  <n-card
+                      style="width: 1100px"
+                      title="Code"
+                      :bordered="false"
+                      size="huge"
+                      role="dialog"
+                      aria-modal="true"
+                  >
+                    <VAceEditor
+                        v-model:value="showCodeContent"
+                        @init="editorInit"
+                        lang="c_cpp"
+                        theme="textmate"
+                        style="height: 800px; font-size: 14px"
+                        :options="{
+                                  enableBasicAutocompletion: true, //启用基本自动完成
+                                  enableSnippets: true, // 启用代码段
+                                  enableLiveAutocompletion: true, // 启用实时自动完成
+                                  fontSize: 14, //设置字号
+                                  tabSize: 2, // 标签大小
+                                  showPrintMargin: false, //去除编辑器里的竖线
+                                  highlightActiveLine: true,
+                                }"
+                        readonly
+                    />
+                  </n-card>
+                </n-modal>
               </n-tab-pane>
               <n-tab-pane name="创建 bot">
                 <NButton type="info"  data-bs-toggle="modal" data-bs-target="#exampleModal"> 创建一个Bot </NButton>
@@ -92,8 +127,8 @@
 
 <script>
 import NavBar from "@/components/NavBar";
-import { NCard, NDivider, NButton, NTabs, NTabPane, NSelect, useMessage } from 'naive-ui';
-import { ref, reactive } from 'vue';
+import { NCard, NDivider, NButton, NTabs, NTabPane, NSelect, NDataTable, useMessage, NModal } from 'naive-ui';
+import { ref, reactive, h } from 'vue';
 import {useStore} from "vuex";
 // 代码框
 import { VAceEditor } from 'vue3-ace-editor';
@@ -104,6 +139,60 @@ import 'ace-builds/src-noconflict/theme-chrome';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import $ from "jquery";
 
+// 初始化数据表格
+const createColumns = ({
+                         showCode, deleteBot
+                       }) => {
+  return [
+    {
+      title: "Game",
+      key: "game"
+    },
+    {
+      title: "Name",
+      key: "title"
+    },
+    {
+      title: "Brief",
+      key: "brief"
+    },
+    {
+      title: "Time",
+      key: "createTime"
+    },
+    {
+      title: "Code",
+      render(row) {
+        return h(
+            NButton,
+            {
+              strong: true,
+              type: "info",
+              size: "small",
+              onClick: () => showCode(row)
+            },
+            { default: () => "查看code" }
+        );
+      }
+    },
+    {
+      title: "Action",
+      key: "actions",
+      render(row) {
+        return h(
+            NButton,
+            {
+              strong: true,
+              type: "error",
+              size: "small",
+              onClick: () => deleteBot(row)
+            },
+            { default: () => "删除" }
+        );
+      }
+    }
+  ];
+};
 
 export default {
   components: {
@@ -114,7 +203,9 @@ export default {
     NTabs,
     NTabPane,
     NSelect,
-    VAceEditor
+    VAceEditor,
+    NDataTable,
+    NModal
   },
   setup() {
     // 设置 代码框
@@ -126,7 +217,6 @@ export default {
 
     const store = useStore();
     const message = useMessage();
-    let bot_code = ref('heelloo dhioas ');
     let bot = reactive({
       title: "",
       brief: "",
@@ -159,6 +249,20 @@ export default {
       })
     }
 
+    // 得到该用户的所有bot
+    let allBots = ref([]);
+    $.ajax({
+      url: "https://gomoku.lxcode.xyz/api/bot/get-all/",
+      type: "get",
+      headers: {
+        Authorization: "Bearer " + store.state.user.token
+      },
+      success(resp) {
+        allBots.value = resp;
+      }
+    });
+
+    // 添加bot的模态框选择
     const options = [
       {
         label: "Gomoku",
@@ -166,11 +270,48 @@ export default {
       },
     ];
 
+    // 展示每个bot代码的模态框
+    let showCodeModal = ref(false); // 机器人代码
+    let showCodeContent = ref('');
+    
     return {
       options,
-      bot_code,
       bot,
       addBot,
+      allBots,
+      showCodeModal,
+      showCodeContent,
+      columns: createColumns({
+        showCode(row) {
+          for (const bot of allBots.value) {
+            if (bot.id === row.id) {
+              showCodeContent.value = bot.code;
+              showCodeModal.value = true;
+              break;
+            }
+          }
+        },
+        deleteBot(row) {
+          $.ajax({
+            url: "https://gomoku.lxcode.xyz/api/bot/delete/",
+            type: "post",
+            data: {
+              id: row.id
+            },
+            headers: {
+              Authorization: "Bearer " + store.state.user.token
+            },
+            success(resp) {
+              if (resp.error_message === "success") {
+                message.success("删除成功！");
+                setTimeout(()=> { location.reload(); }, 800);
+              } else {
+                message.error(resp.error_message);
+              }
+            }
+          })
+        }
+      }),
     }
   }
 }
