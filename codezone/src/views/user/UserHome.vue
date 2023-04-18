@@ -36,7 +36,7 @@
                 />
                 <n-modal v-model:show="showCodeModal">
                   <n-card
-                      style="width: 1100px"
+                      style="width: 800px"
                       title="Code"
                       :bordered="false"
                       size="huge"
@@ -48,7 +48,7 @@
                         @init="editorInit"
                         lang="c_cpp"
                         theme="textmate"
-                        style="height: 800px; font-size: 14px"
+                        style="height: 700px; font-size: 14px"
                         :options="{
                                   enableBasicAutocompletion: true, //启用基本自动完成
                                   enableSnippets: true, // 启用代码段

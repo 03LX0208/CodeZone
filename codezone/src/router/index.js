@@ -2,11 +2,13 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '@/views/HomeView';
 import UserRegister from '@/views/user/account/UserRegister';
 import UserLogIn from '@/views/user/account/UserLogIn';
-import GomokuView from '@/views/game/GomokuView';
+import GomokuView from '@/views/game/gomoku/GomokuView';
 import RecordView from '@/views/RecordView';
 import NotFound from "@/components/error_page/NotFound";
 import UserHome from "@/views/user/UserHome";
 import UserBot from "@/views/user/UserBot";
+
+import TestView from "@/views/TestView";
 
 const routes = [
   {
@@ -55,6 +57,11 @@ const routes = [
     component: UserBot
   },
   {
+    path: '/test',
+    name: 'test',
+    component: TestView
+  },
+  {
     path: "/:catchAll(.*)",
     redirect: "/404",
   },
@@ -67,13 +74,22 @@ const router = createRouter({
 
 
 import store from '@/store/index'
-router.beforeEach(() => {
+
+router.beforeEach((to, from, next) => {
   // 持久化登录
   const jwt_token = localStorage.getItem("jwt_token");
-  store.commit("updateToken", jwt_token);
   if (jwt_token) {
-    store.dispatch("getInfo");
+    store.commit("updateToken", jwt_token);
+    store.dispatch("getInfo", {
+      success() {
+        next();
+      },
+      error() {
+        next();
+      }
+    });
   }
-})
+  next();
+});
 
 export default router

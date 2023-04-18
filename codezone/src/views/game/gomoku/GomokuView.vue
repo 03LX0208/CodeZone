@@ -1,0 +1,77 @@
+<template>
+  <div id="body">
+    <NavBar/>
+    <GameMap v-if="$store.state.gomoku.status === 'playing'" />
+    <GameMatch v-if="$store.state.gomoku.status === 'matching'" />
+  </div>
+</template>
+
+<script>
+import NavBar from "@/components/NavBar";
+import GameMap from "@/components/game/gomoku/GameMap";
+import GameMatch from "@/components/game/gomoku/GameMatch";
+import {useStore} from "vuex";
+import {onMounted, onUnmounted} from "vue";
+import { useMessage } from "naive-ui";
+
+export default {
+  components: {
+    NavBar,
+    GameMap,
+    GameMatch
+  },
+  setup() {
+    const store = useStore();
+    const message = useMessage();
+    const socketUrl = `wss://gomoku.lxcode.xyz/websocket/gomoku/${store.state.user.token}/`;
+
+    let socket = null;
+    onMounted(() => {
+      socket = new WebSocket(socketUrl);
+      store.commit("updateOpponent", {
+        username: "我的对手",
+        photo: "https://codezone-1313033191.cos.ap-beijing.myqcloud.com/user/default_photo.webp"
+      });
+
+      socket.onopen = () => {
+        store.commit("updateSocket", socket);
+      }
+
+      socket.onmessage = msg => {
+        const data = JSON.parse(msg.data);
+        if (data.event === "start-matching") {
+          store.commit("updateOpponent", {
+            username: data.opponent_username,
+            photo: data.opponent_photo
+          });
+          store.commit("updateGameMap", {
+            game_map: data.game_map
+          });
+          console.log(store.state.gomoku.game_map);
+          message.success(`匹配成功！您的对手是${store.state.gomoku.opponent_username}`);
+          setTimeout(() => {
+            store.commit("updateStatus", "playing");
+          }, 2000);
+
+        }
+      }
+
+      socket.onclose = () => {
+        store.commit("updateStatus", "matching");
+      }
+    });
+
+    onUnmounted(() => {
+      socket.close();
+    });
+  }
+}
+</script>
+
+<style scoped>
+#body {
+  min-height: 100vh;
+  background: url("../../../assets/images/gomoku/background.jpg");
+}
+
+</style>

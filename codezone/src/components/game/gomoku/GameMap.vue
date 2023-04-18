@@ -28,7 +28,6 @@ export default {
 
 <style scoped>
 .game-map {
-  height: 80%;
   width: 100%;
   display: flex;
   justify-content: center;

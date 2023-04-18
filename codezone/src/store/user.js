@@ -51,7 +51,7 @@ export default {
                 }
             });
         },
-        getInfo(context) {
+        getInfo(context, data) {
             $.ajax({
                 url: "https://gomoku.lxcode.xyz/api/user/info/",
                 type: "get",
@@ -63,6 +63,10 @@ export default {
                         ...resp,
                         is_login: true,
                     });
+                    data.success();
+                },
+                error() {
+                    data.error();
                 }
             });
         },

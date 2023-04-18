@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
 import UserModule from './user.js'
+import GomokuModule from './gomoku'
 
 export default createStore({
   state: {
@@ -10,5 +11,6 @@ export default createStore({
   },
   modules: {
     user: UserModule,
+    gomoku: GomokuModule,
   }
 })
