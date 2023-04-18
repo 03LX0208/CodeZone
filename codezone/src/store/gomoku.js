@@ -7,6 +7,10 @@ export default {
         opponent_username: "",
         opponent_photo: "",
         game_map: null,
+        a_id: 0, // a是黑旗 b是白旗
+        b_id: 0,
+        my_turn: null, // true表示当前是我的回合
+        gameObject: null,
     },
     getters: {
 
@@ -22,8 +26,16 @@ export default {
         updateStatus(state, status) {
             state.status = status;
         },
-        updateGameMap(state, game_map) {
-            state.game_map = game_map;
+        updateGame(state, game) {
+            state.game_map = game.map;
+            state.a_id = game.a_id;
+            state.b_id = game.b_id;
+        },
+        updateGameObject(state, gameObject) {
+            state.gameObject = gameObject;
+        },
+        updateMyTurn(state, turn) {
+            state.my_turn = turn;
         }
     },
     actions: {

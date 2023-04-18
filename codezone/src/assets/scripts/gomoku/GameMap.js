@@ -1,8 +1,7 @@
-import "./piece"
-import {Piece} from "@/assets/scripts/gomoku/piece";
-
 export class GameMap {
-    constructor(ctx, parent) {
+    constructor(ctx, parent, store) {
+        this.store = store;
+
         this.ctx = ctx; // canvas画板
         this.parent = parent;   // 父元素句柄 为了确认坐标
 
@@ -25,6 +24,8 @@ export class GameMap {
         for (let i = 0; i < 15; i++) {
             for (let j = 0; j < 15; j++) this.board[i][j] = 0;
         }
+
+        this.run();
     }
 
     loadImages() {
@@ -54,24 +55,15 @@ export class GameMap {
                 // 获得相对于canvas左上角的lx ty
                 const lx = event.clientX - rect.left;
                 const ty = event.clientY - rect.top;
-                const [x, y] = this.getClickPoint(lx, ty);
-                // console.log(x, y, this.board[x][y]);
-                // 判断合法
-                if (x !== -1 && y !== -1 && x <= 14 && y <= 14 && this.board[x][y] === 0) {
-                    if (this.turnID & 1) this.board[x][y] = 1; // 1是黑棋
-                    else this.board[x][y] = 2;                 // 2是白棋
-                    this.pieces.push(new Piece(x, y, this.turnID % 2));
-                    // 画出来这颗棋子
-                    this.showOnePiece(x, y, this.turnID & 1);
-                    setTimeout(()=> {
-                        // 判断游戏是否结束
-                        if (this.isWin(x, y, this.board[x][y])) {
-                            if (this.turnID & 1) alert("黑棋赢了");
-                            else alert("白棋赢了");
-                            return null;
-                        }
-                        ++this.turnID;
-                    }, 200);
+                if (this.store.state.gomoku.my_turn === true) {
+                    const [x, y] = this.getClickPoint(lx, ty);
+                    if (x >= 0 && x <= 14 && y >= 0 && y <= 14) {
+                        this.store.state.gomoku.socket.send(JSON.stringify({
+                            event: "move",
+                            x,
+                            y
+                        }));
+                    }
                 }
             });
         }

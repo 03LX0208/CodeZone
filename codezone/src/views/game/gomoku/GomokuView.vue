@@ -39,20 +39,37 @@ export default {
 
       socket.onmessage = msg => {
         const data = JSON.parse(msg.data);
+
         if (data.event === "start-matching") {
           store.commit("updateOpponent", {
             username: data.opponent_username,
             photo: data.opponent_photo
           });
-          store.commit("updateGameMap", {
-            game_map: data.game_map
+          store.commit("updateMyTurn", data.my_turn);
+          store.commit("updateGame", data.game);
+
+          message.success(`匹配成功！您的对手是${store.state.gomoku.opponent_username}`, {
+            duration: 2000
           });
-          console.log(store.state.gomoku.game_map);
-          message.success(`匹配成功！您的对手是${store.state.gomoku.opponent_username}`);
+          if (data.my_turn === true) {
+            message.info("你执黑棋，为先手", {
+              duration: 3000
+            });
+          } else {
+            message.info("你执白棋，为后手", {
+              duration: 3000
+            });
+          }
+
           setTimeout(() => {
             store.commit("updateStatus", "playing");
           }, 2000);
 
+        } else if (data.event === "draw") {
+          store.commit("updateMyTurn", data.my_turn);
+          store.state.gomoku.gameObject.showOnePiece(data.nx, data.ny, data.color);
+        } else if (data.event === "result") {
+          console.log("re");
         }
       }
 

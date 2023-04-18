@@ -2,6 +2,7 @@ package com.zone.backend.consumer;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.zone.backend.consumer.gomoku.Game;
+import com.zone.backend.consumer.gomoku.Piece;
 import com.zone.backend.consumer.utils.JwtAuthentication;
 import com.zone.backend.mapper.UserMapper;
 import com.zone.backend.pojo.User;
@@ -21,8 +22,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 public class WebSocketServer {
     private Session session;
     private User user;
-    final private static ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>();
+    final public static ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>();
     final private static CopyOnWriteArraySet<User> matchPool = new CopyOnWriteArraySet<>();
+    private Game game = null;
 
     private static UserMapper userMapper;
     @Autowired
@@ -60,26 +62,41 @@ public class WebSocketServer {
             matchPool.remove(a);
             matchPool.remove(b);
 
-            Game game = new Game();
+            Game game = new Game(a.getId(), b.getId());
+            game.start(); // 创建一个双人游戏的线程
+            users.get(a.getId()).game = game;
+            users.get(b.getId()).game = game;
+
+
+            JSONObject respGame = new JSONObject();
+            respGame.put("a_id", a.getId());
+            respGame.put("b_id", b.getId());
+            respGame.put("map", game.getGameMap());
 
             JSONObject respA = new JSONObject();
             respA.put("event", "start-matching");
             respA.put("opponent_username", b.getUsername());
             respA.put("opponent_photo", b.getPhoto());
-            respA.put("game_map", game.getGameMap());
+            respA.put("game", respGame);
+            respA.put("my_turn", true);
             users.get(a.getId()).sendMessage(respA.toJSONString());
 
             JSONObject respB = new JSONObject();
             respB.put("event", "start-matching");
             respB.put("opponent_username", a.getUsername());
             respB.put("opponent_photo", a.getPhoto());
-            respB.put("game_map", game.getGameMap());
+            respB.put("game", respGame);
+            respB.put("my_turn", false);
             users.get(b.getId()).sendMessage(respB.toJSONString());
         }
     }
 
     private void stopMatching() {
         matchPool.remove(this.user);
+    }
+
+    private void move(int x, int y) {
+        this.game.setNowStep(new Piece(x, y));
     }
 
     @OnMessage
@@ -91,6 +108,8 @@ public class WebSocketServer {
             startMatching();
         } else if ("stop-matching".equals(event)) {
             stopMatching();
+        } else if ("move".equals(event)) {
+            move(data.getInteger("x"), data.getInteger("y"));
         }
     }
 
