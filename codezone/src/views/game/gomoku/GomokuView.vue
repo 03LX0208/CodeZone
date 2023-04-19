@@ -68,8 +68,17 @@ export default {
         } else if (data.event === "draw") {
           store.commit("updateMyTurn", data.my_turn);
           store.state.gomoku.gameObject.showOnePiece(data.nx, data.ny, data.color);
+          if (data.my_turn) {
+            message.info("现在是你的回合");
+          }
         } else if (data.event === "result") {
-          console.log("re");
+          if (data.loser === "A") {
+            message.info("白棋获胜！！");
+          } else if (data.loser === "B") {
+            message.info("黑棋获胜！！");
+          } else if (data.loser === "all") {
+            message.info("平局！！");
+          }
         }
       }
 
@@ -90,5 +99,6 @@ export default {
   min-height: 100vh;
   background: url("../../../assets/images/gomoku/background.jpg");
 }
+
 
 </style>

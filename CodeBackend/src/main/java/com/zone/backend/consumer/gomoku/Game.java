@@ -3,18 +3,21 @@ package com.zone.backend.consumer.gomoku;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.zone.backend.consumer.WebSocketServer;
+import com.zone.backend.pojo.Record;
 import org.springframework.security.core.parameters.P;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TransferQueue;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Game extends Thread {
     final static int rows = 15;
     final static int cols = 15;
-    final private int[][] g;
+    final private int[][] g;    // 黑棋是1 白棋是2
     final private Player playerA, playerB; // 这场游戏的两个玩家
-
+    private List<Piece> steps = null;   // 记录这一局的每一步
     private int turnId = 1; // 奇数是黑 偶数是白
     private Piece nowStep = null;
     final private ReentrantLock lock = new ReentrantLock();
@@ -29,8 +32,9 @@ public class Game extends Thread {
                 this.g[i][j] = 0;
             }
         }
-        this.playerA = new Player(idA, new ArrayList<>());
-        this.playerB = new Player(idB, new ArrayList<>());
+        this.playerA = new Player(idA);
+        this.playerB = new Player(idB);
+        this.steps = new ArrayList<>();
     }
 
     public Player getPlayerA() {
@@ -47,7 +51,6 @@ public class Game extends Thread {
                 } else {
                     g[nowStep.getX()][nowStep.getY()] = 2;
                 }
-                System.out.println(this.nowStep);
                 this.turnId++;
             }
         } finally {
@@ -61,14 +64,13 @@ public class Game extends Thread {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 300; i++) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
                 lock.lock();
                 try {
                     if (nowStep != null) {
-                        playerA.getSteps().add(nowStep);
-                        playerB.getSteps().add(nowStep);
+                        this.steps.add(nowStep);
                         return true;
                     }
                 } finally {
@@ -97,12 +99,29 @@ public class Game extends Thread {
         WebSocketServer.users.get(this.playerB.getUserId()).sendMessage(message);
     }
 
+    private void setToDatabase() {
+        StringBuilder res = new StringBuilder();
+        for (Piece p : this.steps) {
+            res.append(p.getX().toString()).append(" ").append(p.getY().toString()).append(" ");
+        }
+        Record record = new Record(null,
+                "gomoku",
+                this.playerA.getUserId(),
+                this.playerB.getUserId(),
+                res.toString(),
+                this.loser,
+                new Date()
+                );
+        WebSocketServer.recordMapper.insert(record);
+    }
+
     private void sendResult() { // 向两名玩家广播游戏结果
         JSONObject resp = new JSONObject();
         resp.put("event", "result");
         resp.put("loser", this.loser);
         sendAMessage(resp.toJSONString());
         sendBMessage(resp.toJSONString());
+        setToDatabase();
     }
 
     private void sendDraw() {
@@ -138,7 +157,76 @@ public class Game extends Thread {
 
 
     private void isWin() {
+        int cnt = 0, color = 1, x = this.nowStep.getX(), y = this.nowStep.getY();
+        if (this.turnId % 2 == 1) color = 2;
 
+        // 横
+        for (int i = Math.max(x - 4, 0); i <= Math.min(14, x + 4); i++) {
+            if (g[i][y] == color) {
+                ++cnt;
+                if (cnt >= 5) {
+                    this.status = "finished";
+                    if (color == 1) {
+                        this.loser = "B";
+                    } else this.loser = "A";
+                    return;
+                }
+            } else cnt = 0;
+        }
+
+        // 竖
+        cnt = 0;
+        for (int i = Math.max(y - 4, 0); i <= Math.min(14, y + 4); i++) {
+            if (g[x][i] == color) {
+                ++cnt;
+                if (cnt >= 5) {
+                    this.status = "finished";
+                    if (color == 1) {
+                        this.loser = "B";
+                    } else this.loser = "A";
+                    return;
+                }
+            } else cnt = 0;
+        }
+
+        // 撇
+        cnt = 0;
+        for (int i = -4; i <= 4; i++) {
+            int dx = x + i, dy = y + i;
+            if (dx < 0 || dx > 14 || dy < 0 || dy > 14) continue;
+            if (g[dx][dy] == color) {
+                ++cnt;
+                if (cnt >= 5) {
+                    this.status = "finished";
+                    if (color == 1) {
+                        this.loser = "B";
+                    } else this.loser = "A";
+                    return;
+                }
+            } else cnt = 0;
+        }
+
+        // 捺
+        cnt = 0;
+        for (int i = -4; i <= 4; i++) {
+            int dx = x + i, dy = y - i;
+            if (dx < 0 || dx > 14 || dy < 0 || dy > 14) continue;
+            if (g[dx][dy] == color) {
+                ++cnt;
+                if (cnt >= 5) {
+                    this.status = "finished";
+                    if (color == 1) {
+                        this.loser = "B";
+                    } else this.loser = "A";
+                    return;
+                }
+            } else cnt = 0;
+        }
+
+        if (this.turnId == 226) {
+            this.status = "finished";
+            this.loser = "all";
+        }
     }
 
     @Override
@@ -146,11 +234,10 @@ public class Game extends Thread {
         for (int i = 0; i < 225; i++) {
             if (waitNowStep()) {
                 isWin();
+                sendDraw();
                 if ("finished".equals(this.status)) {
                     sendResult();
                     break;
-                } else {
-                    sendDraw();
                 }
             } else {
                 lock.lock();
@@ -159,6 +246,7 @@ public class Game extends Thread {
                     if (turnId % 2 == 1) {
                         this.loser = "A";
                     } else this.loser = "B";
+                    sendResult();
                 } finally {
                     lock.unlock();
                 }
