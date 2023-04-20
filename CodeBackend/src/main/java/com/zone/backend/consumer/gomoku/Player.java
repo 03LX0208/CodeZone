@@ -11,4 +11,5 @@ import java.util.List;
 @NoArgsConstructor
 public class Player {
     private Integer userId;
+    private String username;
 }

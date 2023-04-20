@@ -11,7 +11,7 @@
             <router-link :to="{name: 'game_gomoku'}" :class="route_name !== 'game_gomoku' ? 'nav-link' : 'nav-link active'" aria-current="page" href="#">游戏</router-link>
           </li>
           <li class="nav-item">
-            <router-link :to="{name: 'record'}" :class="route_name !== 'record' ? 'nav-link' : 'nav-link active'" aria-current="page" href="#">对局记录</router-link>
+            <router-link :to="{name: 'record'}" :class="(route_name !== 'record' && route_name !== 'gomoku_record') ? 'nav-link' : 'nav-link active'" aria-current="page" href="#">对局记录</router-link>
           </li>
         </ul>
         <ul class="navbar-nav">

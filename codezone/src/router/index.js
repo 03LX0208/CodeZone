@@ -7,7 +7,7 @@ import RecordView from '@/views/RecordView';
 import NotFound from "@/components/error_page/NotFound";
 import UserHome from "@/views/user/UserHome";
 import UserBot from "@/views/user/UserBot";
-
+import GomokuRecord from "@/views/game/gomoku/GomokuRecord";
 import TestView from "@/views/TestView";
 
 const routes = [
@@ -60,6 +60,11 @@ const routes = [
     path: '/test',
     name: 'test',
     component: TestView
+  },
+  {
+    path: '/record/gomoku/:id',
+    name: 'gomoku_record',
+    component: GomokuRecord
   },
   {
     path: "/:catchAll(.*)",

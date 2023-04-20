@@ -2,10 +2,10 @@
   <div class="container">
     <div class="row">
       <div class="col-6 d-flex  text-center justify-content-center">
-        <n-card style="max-width: 200px; margin-top: 50px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+        <n-card style="max-width: 270px; margin-top: 50px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
           <template #cover>
             <div class="d-flex justify-content-center" style="padding: 30px 50px 10px 50px">
-              <img style="max-width: 160px" :src="$store.state.user.photo" alt="#">
+              <img style="width: 160px; height: 160px; object-fit: cover;" :src="$store.state.user.photo" alt="#">
             </div>
           </template>
           <span style="font-family: si-yuan, sans-serif; font-size: 30px;"> {{ $store.state.user.username }} </span>
@@ -13,10 +13,10 @@
         </n-card>
       </div>
       <div class="col-6 d-flex text-center justify-content-center">
-        <n-card style="max-width: 200px; margin-top: 50px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+        <n-card style="max-width: 270px; margin-top: 50px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
           <template #cover>
             <div class="d-flex justify-content-center" style="padding: 30px 50px 10px 50px">
-              <img style="max-width: 160px" :src="$store.state.gomoku.opponent_photo" alt="#">
+              <img style="width: 160px; height: 160px; object-fit: cover;" :src="$store.state.gomoku.opponent_photo" alt="#">
             </div>
           </template>
           <span style="font-family: si-yuan, sans-serif; font-size: 30px;"> {{ $store.state.gomoku.opponent_username }} </span>

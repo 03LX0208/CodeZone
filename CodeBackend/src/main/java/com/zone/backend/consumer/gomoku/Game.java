@@ -24,7 +24,7 @@ public class Game extends Thread {
     private String status = "playing";  //  这局游戏的状态 "finished"表示游戏已经结束
     private String loser = ""; // "all"表示平局 "A"表示A输了
 
-    public Game(Integer idA, Integer idB) {
+    public Game(Integer idA, String aUsername, Integer idB, String bUsername) {
         // 初始化五子棋棋盘
         this.g = new int[rows][cols];
         for (int i = 0; i < rows; i++) {
@@ -32,8 +32,8 @@ public class Game extends Thread {
                 this.g[i][j] = 0;
             }
         }
-        this.playerA = new Player(idA);
-        this.playerB = new Player(idB);
+        this.playerA = new Player(idA, aUsername);
+        this.playerB = new Player(idB, bUsername);
         this.steps = new ArrayList<>();
     }
 
@@ -107,7 +107,9 @@ public class Game extends Thread {
         Record record = new Record(null,
                 "gomoku",
                 this.playerA.getUserId(),
+                this.playerA.getUsername(),
                 this.playerB.getUserId(),
+                this.playerB.getUsername(),
                 res.toString(),
                 this.loser,
                 new Date()

@@ -17,7 +17,9 @@ public class Record {
     private Integer id;
     private String game;
     private Integer aId;
+    private String aUsername;
     private Integer bId;
+    private String bUsername;
     private String steps;
     private String loser;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")

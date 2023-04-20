@@ -69,7 +69,7 @@ public class WebSocketServer {
             matchPool.remove(a);
             matchPool.remove(b);
 
-            Game game = new Game(a.getId(), b.getId());
+            Game game = new Game(a.getId(), a.getUsername(), b.getId(), b.getUsername());
             game.start(); // 创建一个双人游戏的线程
             users.get(a.getId()).game = game;
             users.get(b.getId()).game = game;

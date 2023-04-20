@@ -4,17 +4,20 @@
     <div class="container">
       <div class="row">
         <div class="col-3 text-center justify-content-center">
-          <n-card style="max-width: 250px; margin-top: 50px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+          <n-card style="max-width: 270px; margin-top: 50px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
             <template #cover>
               <div class="d-flex justify-content-center" style="padding: 30px 50px 10px 50px">
-                <img style="max-width: 160px" :src="$store.state.user.photo" alt="#">
+                <img style="width: 160px; height: 160px; object-fit: cover;" :src="$store.state.user.photo" alt="#">
               </div>
             </template>
             <span style="font-family: si-yuan, sans-serif; font-size: 30px;"> {{ $store.state.user.username }} </span>
             <n-divider/>
-            <n-button strong secondary round type="info">
-              更新头像
-            </n-button>
+            <div>
+              <label for="file-upload" class="custom-file-upload">
+                <i class="fa fa-cloud-upload"></i> 更新头像
+              </label>
+              <input id="file-upload" style="display: none" type="file" ref="fileInput" @change="uploadImage"/>
+            </div>
           </n-card>
         </div>
         <div class="col-9">
@@ -115,7 +118,14 @@
                 </div>
               </n-tab-pane>
               <n-tab-pane name="我的对局">
-                暂无
+                <n-data-table
+                    :columns="recordColumns"
+                    :data="records"
+                    :pagination="false"
+                    :bordered="false"
+                    :single-line="false"
+                    style="font-family: si-yuan, sans-serif; font-weight: 750; font-size: 15px;"
+                />
               </n-tab-pane>
             </n-tabs>
           </n-card>
@@ -130,6 +140,7 @@ import NavBar from "@/components/NavBar";
 import { NCard, NDivider, NButton, NTabs, NTabPane, NSelect, NDataTable, useMessage, NModal } from 'naive-ui';
 import { ref, reactive, h } from 'vue';
 import {useStore} from "vuex";
+import axios from 'axios';
 // 代码框
 import { VAceEditor } from 'vue3-ace-editor';
 import ace from 'ace-builds';
@@ -139,7 +150,7 @@ import 'ace-builds/src-noconflict/theme-chrome';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import $ from "jquery";
 
-// 初始化数据表格
+// 初始化bot数据表格
 const createColumns = ({
                          showCode, deleteBot
                        }) => {
@@ -188,6 +199,42 @@ const createColumns = ({
               onClick: () => deleteBot(row)
             },
             { default: () => "删除" }
+        );
+      }
+    }
+  ];
+};
+
+// 初始化对局记录数据表格
+const createRecordColumns = ({
+                         showRecord
+                       }) => {
+  return [
+    {
+      title: "Game",
+      key: "game"
+    },
+    {
+      title: "参与者",
+      key: "users"
+    },
+    {
+      title: "游戏时间",
+      key: "time"
+    },
+    {
+      title: "录像",
+      key: "actions",
+      render(row) {
+        return h(
+            NButton,
+            {
+              strong: true,
+              type: "info",
+              size: "small",
+              onClick: () => showRecord(row)
+            },
+            { default: () => "查看录像" }
         );
       }
     }
@@ -273,8 +320,59 @@ export default {
     // 展示每个bot代码的模态框
     let showCodeModal = ref(false); // 机器人代码
     let showCodeContent = ref('');
-    
+
+    // 上传头像
+    let fileInput = ref(null);
+    const uploadImage = async () => {
+      // 获取文件对象
+      const file = fileInput.value.files[0]
+
+      // 创建 FormData 对象
+      const formData = new FormData()
+      formData.append('image', file)
+
+      // 发送请求
+      await axios.post('https://gomoku.lxcode.xyz/api/upload/image/', formData, {
+        headers: {
+          Authorization: "Bearer " + store.state.user.token,
+        },
+      }).then(response => {
+        if (response.data.error_message === "success") {
+          message.success("更新成功！");
+          setTimeout(() => {location.reload();}, 2000);
+        } else {
+          alert("上传失败！");
+        }
+      }).catch(error => {
+        alert(error)
+      });
+    };
+
+    // 有关我的对局录像
+    let records = ref([]);
+    $.ajax({
+      url: "https://gomoku.lxcode.xyz/api/record/all/",
+      type: "get",
+      success(resp) {
+        let _records = [];
+        for (const record of resp) {
+          if (Number(record.aid) === Number(store.state.user.id) || Number(record.bid) === Number(store.state.user.id)) {
+            _records.push({
+              game: record.game,
+              id: record.id,
+              users: record.ausername + " and " +  record.busername,
+              time: record.time
+            });
+          }
+        }
+        records.value = _records;
+      }
+    });
+
     return {
+      records,
+      uploadImage,
+      fileInput,
       options,
       bot,
       addBot,
@@ -312,6 +410,11 @@ export default {
           })
         }
       }),
+      recordColumns: createRecordColumns({
+        showRecord(row) {
+          window.open(`/record/${row.game}/${row.id}`, '_blank');
+        }
+      }),
     }
   }
 }
@@ -323,6 +426,23 @@ export default {
   min-height: 100vh;
   background-color: rgb(247,248,250);
 
+}
+
+#file-upload {
+  display: none;
+}
+.custom-file-upload {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #3f51b5;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.custom-file-upload:hover {
+  background-color: #303f9f;
 }
 
 </style>

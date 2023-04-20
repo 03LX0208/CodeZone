@@ -39,7 +39,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/user/token/",
-                        "/api/user/register/"
+                        "/api/user/register/",
+                        "/api/record/all/",
+                        "/api/user/get-photo/"
                 )
                 .permitAll()
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
