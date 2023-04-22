@@ -92,11 +92,15 @@ public class Game extends Thread {
     }
 
     private void sendAMessage(String message) {
-        WebSocketServer.users.get(this.playerA.getUserId()).sendMessage(message);
+        if (WebSocketServer.users.get(this.playerA.getUserId()) != null) {
+            WebSocketServer.users.get(this.playerA.getUserId()).sendMessage(message);
+        }
     }
 
     private void sendBMessage(String message) {
-        WebSocketServer.users.get(this.playerB.getUserId()).sendMessage(message);
+        if (WebSocketServer.users.get(this.playerB.getUserId()) != null) {
+            WebSocketServer.users.get(this.playerB.getUserId()).sendMessage(message);
+        }
     }
 
     private void setToDatabase() {

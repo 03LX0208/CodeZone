@@ -44,6 +44,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/user/get-photo/"
                 )
                 .permitAll()
+                .antMatchers(
+                  "/game/start/"
+                ).hasIpAddress("127.0.0.1")
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
                 .anyRequest().authenticated();
 

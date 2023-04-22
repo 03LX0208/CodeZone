@@ -14,57 +14,90 @@ const routes = [
   {
     path: '/',
     name: 'root',
-    component: HomeView
+    component: HomeView,
+    meta: {
+      requestAuth: false,
+    }
   },
   {
     path: '/home',
     name: 'home',
-    component: HomeView
+    component: HomeView,
+    meta: {
+      requestAuth: false,
+    }
   },
   {
     path: '/user/register',
     name: 'register',
-    component: UserRegister
+    component: UserRegister,
+    meta: {
+      requestAuth: false,
+    }
   },
   {
     path: '/user/login',
     name: 'login',
-    component: UserLogIn
+    component: UserLogIn,
+    meta: {
+      requestAuth: false,
+    }
   },
   {
     path: '/game/gomoku',
     name: 'game_gomoku',
-    component: GomokuView
+    component: GomokuView,
+    meta: {
+      requestAuth: true,
+    }
   },
   {
     path: '/record',
     name: 'record',
-    component: RecordView
+    component: RecordView,
+    meta: {
+      requestAuth: false,
+    }
   },
   {
     path: '/404',
     name: '404',
-    component: NotFound
+    component: NotFound,
+    meta: {
+      requestAuth: false,
+    }
   },
   {
     path: '/user/home',
     name: 'user_home',
-    component: UserHome
+    component: UserHome,
+    meta: {
+      requestAuth: true,
+    }
   },
   {
     path: '/user/bot',
     name: 'user_bot',
-    component: UserBot
+    component: UserBot,
+    meta: {
+      requestAuth: true,
+    }
   },
   {
     path: '/test',
     name: 'test',
-    component: TestView
+    component: TestView,
+    meta: {
+      requestAuth: false,
+    }
   },
   {
     path: '/record/gomoku/:id',
     name: 'gomoku_record',
-    component: GomokuRecord
+    component: GomokuRecord,
+    meta: {
+      requestAuth: false,
+    }
   },
   {
     path: "/:catchAll(.*)",
@@ -81,7 +114,7 @@ const router = createRouter({
 import store from '@/store/index'
 
 router.beforeEach((to, from, next) => {
-  // 持久化登录
+  // 持久化登录 权限管理
   const jwt_token = localStorage.getItem("jwt_token");
   if (jwt_token) {
     store.commit("updateToken", jwt_token);
@@ -90,11 +123,12 @@ router.beforeEach((to, from, next) => {
         next();
       },
       error() {
-        next();
+        setTimeout(() => {router.push({name: 'login'});}, 800);
       }
     });
-  }
-  next();
+  } else if (to.meta.requestAuth) {
+    setTimeout(() => {router.push({name: 'login'});}, 800);
+  } else next();
 });
 
 export default router
