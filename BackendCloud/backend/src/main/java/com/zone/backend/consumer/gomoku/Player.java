@@ -11,5 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Player {
     private Integer userId;
+    private Integer botId; // 0表示亲自出马
+    private String botCode;
     private String username;
 }

@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class Player {
     private Integer userId;
     private Integer waitTime;
+    private Integer botId;
 }

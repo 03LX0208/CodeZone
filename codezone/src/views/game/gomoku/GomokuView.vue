@@ -61,9 +61,7 @@ export default {
             });
           }
 
-          setTimeout(() => {
-            store.commit("updateStatus", "playing");
-          }, 2000);
+          store.commit("updateStatus", "playing");
 
         } else if (data.event === "draw") {
           store.commit("updateMyTurn", data.my_turn);

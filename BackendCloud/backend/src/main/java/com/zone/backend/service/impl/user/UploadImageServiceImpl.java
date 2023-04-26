@@ -31,8 +31,8 @@ public class UploadImageServiceImpl implements UploadImageService {
     public Map<String, String> uploadImage(File file) {
         Map<String, String> res = new HashMap<>();
         // 第2步得到的密钥
-        String secretId = "AKIDmOkovqWyAEBwiOzX3NTKxQghgV6VeXCd";
-        String secretKey = "HJ6dw1rUsJelcDgBZv7GCwUyIRO7cfKj";
+        String secretId = "";
+        String secretKey = "";
         // 生成用户
         COSCredentials cred = new BasicCOSCredentials(secretId, secretKey);
         // 设置地区

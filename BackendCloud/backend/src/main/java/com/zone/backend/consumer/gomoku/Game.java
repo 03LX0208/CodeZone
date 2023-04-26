@@ -3,8 +3,11 @@ package com.zone.backend.consumer.gomoku;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.zone.backend.consumer.WebSocketServer;
+import com.zone.backend.pojo.Bot;
 import com.zone.backend.pojo.Record;
 import org.springframework.security.core.parameters.P;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,7 +27,7 @@ public class Game extends Thread {
     private String status = "playing";  //  这局游戏的状态 "finished"表示游戏已经结束
     private String loser = ""; // "all"表示平局 "A"表示A输了
 
-    public Game(Integer idA, String aUsername, Integer idB, String bUsername) {
+    public Game(Integer idA, Bot botA, String aUsername, Integer idB, Bot botB, String bUsername) {
         // 初始化五子棋棋盘
         this.g = new int[rows][cols];
         for (int i = 0; i < rows; i++) {
@@ -32,8 +35,20 @@ public class Game extends Thread {
                 this.g[i][j] = 0;
             }
         }
-        this.playerA = new Player(idA, aUsername);
-        this.playerB = new Player(idB, bUsername);
+
+        Integer botAId = -1, botBId = -1;
+        String botACode = "", botBCode = "";
+        if (botA != null) {
+            botAId = botA.getId();
+            botACode = botA.getCode();
+        }
+        if (botB != null) {
+            botBId = botB.getId();
+            botBCode = botB.getCode();
+        }
+
+        this.playerA = new Player(idA, botAId, botACode, aUsername);
+        this.playerB = new Player(idB, botBId, botBCode, bUsername);
         this.steps = new ArrayList<>();
     }
 
@@ -41,7 +56,18 @@ public class Game extends Thread {
         return this.playerA;
     }
 
-    public void setNowStep(Piece nowStep) {
+    public void setNowStep(Piece nowStep, boolean isBot) {
+        // 当时bot执行时 需要屏蔽人
+        if (!isBot && this.turnId % 2 == 1 && playerA.getBotId() > 0) return;
+        if (!isBot && this.turnId % 2 == 0 && playerB.getBotId() > 0) return;
+
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println(nowStep);
         lock.lock();
         try {
             if (this.g[nowStep.getX()][nowStep.getY()] == 0) {
@@ -58,12 +84,40 @@ public class Game extends Thread {
         }
     }
 
+    private String getInput() {
+        StringBuilder input = new StringBuilder();
+        input.append(this.turnId);
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                input.append(" ").append(this.g[i][j]);
+            }
+        }
+        return input.toString();
+    }
+
+    // bot执行代码
+    private void sendBotCode(Player player) {
+        MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
+        data.add("user_id", player.getUserId().toString());
+        data.add("bot_code", player.getBotCode());
+        data.add("input", getInput());
+        WebSocketServer.restTemplate.postForObject("http://127.0.0.1:3083/bot/add/", data, String.class);
+    }
+
     private boolean waitNowStep() { // 等待这名玩家
         try {
             Thread.sleep(200);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+
+        // 不是亲自出马需要调用Bot Running System
+        if (this.turnId % 2 == 1) {
+            if (playerA.getBotId() > 0) sendBotCode(playerA);
+        } else {
+            if (playerB.getBotId() > 0) sendBotCode(playerB);
+        }
+
         for (int i = 0; i < 300; i++) {
             try {
                 Thread.sleep(100);

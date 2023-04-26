@@ -4,8 +4,10 @@ import com.alibaba.fastjson2.JSONObject;
 import com.zone.backend.consumer.gomoku.Game;
 import com.zone.backend.consumer.gomoku.Piece;
 import com.zone.backend.consumer.utils.JwtAuthentication;
+import com.zone.backend.mapper.BotMapper;
 import com.zone.backend.mapper.RecordMapper;
 import com.zone.backend.mapper.UserMapper;
+import com.zone.backend.pojo.Bot;
 import com.zone.backend.pojo.Record;
 import com.zone.backend.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +30,12 @@ public class WebSocketServer {
     private Session session;
     private User user;
     final public static ConcurrentHashMap<Integer, WebSocketServer> users = new ConcurrentHashMap<>();
-    private Game game = null;
+    public Game game = null;
 
     private static UserMapper userMapper;
     public static RecordMapper recordMapper;
-    private static RestTemplate restTemplate;
+    private static BotMapper botMapper;
+    public static RestTemplate restTemplate;
     @Autowired
     public void setUserMapper(UserMapper userMapper) {
         WebSocketServer.userMapper = userMapper;
@@ -45,6 +48,8 @@ public class WebSocketServer {
     public void setRestTemplate(RestTemplate restTemplate) {
         WebSocketServer.restTemplate = restTemplate;
     }
+    @Autowired
+    public void setBotMapper(BotMapper botMapper) { WebSocketServer.botMapper = botMapper;}
 
     @OnOpen
     public void onOpen(Session session, @PathParam("token") String token) throws IOException {
@@ -67,9 +72,11 @@ public class WebSocketServer {
         }
     }
 
-    public static void startGame(Integer aId, Integer bId) {
+    public static void startGame(Integer aId, Integer aBotId, Integer bId, Integer bBotId) {
         User a = userMapper.selectById(aId), b = userMapper.selectById(bId);
-        Game game = new Game(a.getId(), a.getUsername(), b.getId(), b.getUsername());
+        Bot botA = botMapper.selectById(aBotId), botB = botMapper.selectById(bBotId);
+
+        Game game = new Game(a.getId(), botA, a.getUsername(), b.getId(), botB, b.getUsername());
         game.start(); // 创建一个双人游戏的线程
         if (users.get(a.getId()) != null) {
             users.get(a.getId()).game = game;
@@ -107,9 +114,10 @@ public class WebSocketServer {
 
     private static final String addPlayerUrl = "http://127.0.0.1:3082/player/add/";
     private static final String removePlayerUrl = "http://127.0.0.1:3082/player/remove/";
-    private void startMatching() {
+    private void startMatching(Integer botId) {
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
         data.add("user_id", this.user.getId().toString());
+        data.add("bot_id", botId.toString());
         restTemplate.postForObject(addPlayerUrl, data, String.class);
     }
 
@@ -119,8 +127,8 @@ public class WebSocketServer {
         restTemplate.postForObject(removePlayerUrl, data, String.class);
     }
 
-    private void move(int x, int y) {
-        this.game.setNowStep(new Piece(x, y));
+    private void move(int x, int y, boolean isBot) {
+        this.game.setNowStep(new Piece(x, y), isBot);
     }
 
     @OnMessage
@@ -129,11 +137,11 @@ public class WebSocketServer {
         JSONObject data = JSONObject.parseObject(message);
         String event = data.getString("event");
         if ("start-matching".equals(event)) {
-            startMatching();
+            startMatching(data.getInteger("bot_id"));
         } else if ("stop-matching".equals(event)) {
             stopMatching();
         } else if ("move".equals(event)) {
-            move(data.getInteger("x"), data.getInteger("y"));
+            move(data.getInteger("x"), data.getInteger("y"), false);
         }
     }
 

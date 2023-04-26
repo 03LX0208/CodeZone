@@ -20,10 +20,10 @@ public class MatchingPool extends Thread {
         MatchingPool.restTemplate = restTemplate;
     }
 
-    public void addPlayer(Integer userId) {
+    public void addPlayer(Integer userId, Integer botId) {
         lock.lock();
         try {
-            players.add(new Player(userId, 0));
+            players.add(new Player(userId, 0, botId));
         } finally {
             lock.unlock();
         }
@@ -57,7 +57,9 @@ public class MatchingPool extends Thread {
     private void sendResult(Player a, Player b) {  // 返回匹配结果
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
         data.add("a_id", a.getUserId().toString());
+        data.add("a_bot_id", a.getBotId().toString());
         data.add("b_id", b.getUserId().toString());
+        data.add("b_bot_id", b.getBotId().toString());
         restTemplate.postForObject("http://127.0.0.1:3081/game/start/", data, String.class);
     }
 

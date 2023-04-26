@@ -46,12 +46,12 @@ export class Record {
                         setTimeout(() => {
                             this.drawBlackPiece(x, y);
                             resolve();
-                        }, 500 * (i + 1)/2);
+                        }, 200 * (i + 2) / 2);
                     } else {
                         setTimeout(() => {
                             this.drawWhitePiece(x, y);
                             resolve();
-                        }, 500 * (i + 1)/2);
+                        }, 200 * (i + 2) / 2);
                     }
                 });
                 promises.push(promise);
