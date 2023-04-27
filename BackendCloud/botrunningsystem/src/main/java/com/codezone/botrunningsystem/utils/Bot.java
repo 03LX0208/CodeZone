@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class Bot implements java.util.function.Supplier<String> {
 
     public String nextMove(String input) {
-        System.out.println(input);
+//        System.out.println(input);
         String[] array = input.split(" ");
         int[][] g = new int[15][15];
         int color = -1, turnID = Integer.parseInt(array[0]), idx = 1;

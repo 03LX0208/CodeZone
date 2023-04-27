@@ -14,6 +14,7 @@
     "bootstrap": "^5.2.3",
     "core-js": "^3.6.5",
     "jquery": "^3.6.4",
+    "md-editor-v3": "^2.11.2",
     "naive-ui": "^2.34.3",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",

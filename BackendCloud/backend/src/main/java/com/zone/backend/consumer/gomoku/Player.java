@@ -12,6 +12,7 @@ import java.util.List;
 public class Player {
     private Integer userId;
     private Integer botId; // 0表示亲自出马
+    private String lang; // 语言类型
     private String botCode;
     private String username;
 }

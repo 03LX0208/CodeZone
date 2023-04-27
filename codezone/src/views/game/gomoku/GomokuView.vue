@@ -47,6 +47,7 @@ export default {
           });
           store.commit("updateMyTurn", data.my_turn);
           store.commit("updateGame", data.game);
+          store.commit("updateIsBot", data.is_bot);
 
           message.success(`匹配成功！您的对手是${store.state.gomoku.opponent_username}`, {
             duration: 2000
@@ -66,8 +67,10 @@ export default {
         } else if (data.event === "draw") {
           store.commit("updateMyTurn", data.my_turn);
           store.state.gomoku.gameObject.showOnePiece(data.nx, data.ny, data.color);
-          if (data.my_turn) {
-            message.info("现在是你的回合");
+          if (data.my_turn && !store.state.gomoku.is_bot) {
+            message.info("现在是你的回合", {
+              duration: 500
+            });
           }
         } else if (data.event === "result") {
           if (data.loser === "A") {

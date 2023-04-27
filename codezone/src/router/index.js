@@ -9,6 +9,10 @@ import UserHome from "@/views/user/UserHome";
 import UserBot from "@/views/user/UserBot";
 import GomokuRecord from "@/views/game/gomoku/GomokuRecord";
 import TestView from "@/views/TestView";
+import CppDemo from "@/views/game/gomoku/CppDemo";
+import PythonDemo from "@/views/game/gomoku/PythonDemo";
+import GolangDemo from "@/views/game/gomoku/GolangDemo";
+import JavaDemo from "@/views/game/gomoku/JavaDemo";
 
 const routes = [
   {
@@ -49,6 +53,38 @@ const routes = [
     component: GomokuView,
     meta: {
       requestAuth: true,
+    }
+  },
+  {
+    path: '/game/gomoku/demo/cpp',
+    name: 'gomoku_cpp_demo',
+    component: CppDemo,
+    meta: {
+      requestAuth: false,
+    }
+  },
+  {
+    path: '/game/gomoku/demo/java',
+    name: 'gomoku_java_demo',
+    component: JavaDemo,
+    meta: {
+      requestAuth: false,
+    }
+  },
+  {
+    path: '/game/gomoku/demo/golang',
+    name: 'gomoku_golang_demo',
+    component: GolangDemo,
+    meta: {
+      requestAuth: false,
+    }
+  },
+  {
+    path: '/game/gomoku/demo/python',
+    name: 'gomoku_python_demo',
+    component: PythonDemo,
+    meta: {
+      requestAuth: false,
     }
   },
   {
@@ -115,19 +151,21 @@ import store from '@/store/index'
 
 router.beforeEach((to, from, next) => {
   // 持久化登录 权限管理
+
   const jwt_token = localStorage.getItem("jwt_token");
-  if (jwt_token) {
+  if (jwt_token !== "") {
     store.commit("updateToken", jwt_token);
     store.dispatch("getInfo", {
       success() {
         next();
       },
       error() {
-        setTimeout(() => {router.push({name: 'login'});}, 800);
+        localStorage.setItem("jwt_token", "");
+        setTimeout(() => {router.push({name: 'login'});}, 500);
       }
     });
   } else if (to.meta.requestAuth) {
-    setTimeout(() => {router.push({name: 'login'});}, 800);
+    setTimeout(() => {router.push({name: 'login'});}, 500);
   } else next();
 });
 

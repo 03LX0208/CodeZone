@@ -39,7 +39,7 @@
                 />
                 <n-modal v-model:show="showCodeModal">
                   <n-card
-                      style="width: 800px"
+                      style="width: 1000px;"
                       title="Code"
                       :bordered="false"
                       size="huge"
@@ -67,7 +67,16 @@
                 </n-modal>
               </n-tab-pane>
               <n-tab-pane name="创建 bot">
-                <NButton type="info"  data-bs-toggle="modal" data-bs-target="#exampleModal"> 创建一个Bot </NButton>
+                <NButton type="info" size="large" data-bs-toggle="modal" data-bs-target="#exampleModal"> 创建一个Bot </NButton>
+                <n-divider/>
+                <div>你可能需要一些怎么输入输出的提示，下面是一些供参考的demo</div>
+                <n-divider/>
+                <n-space>
+                  <NButton tertiary round type="primary" @click="toDemoCpp"> demo.cpp </NButton>
+                  <NButton tertiary round type="primary" @click="toDemoPython"> demo.py </NButton>
+                  <NButton tertiary round type="primary" @click="toDemoGolang"> demo.go </NButton>
+                  <NButton tertiary round type="primary" @click="toDemoJava"> demo.java </NButton>
+                </n-space>
                 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                   <div class="modal-dialog modal-xl">
                     <div class="modal-content">
@@ -88,6 +97,10 @@
                           <div class="mb-3">
                             <label for="message-text" class="col-form-label">游戏：</label>
                             <n-select v-model:value="bot.game" :options="options" />
+                          </div>
+                          <div class="mb-3">
+                            <label for="message-text" class="col-form-label">语言：</label>
+                            <n-select v-model:value="bot.lang" :options="langOptions" />
                           </div>
                           <div class="mb-3">
                             <label for="message-text" class="col-form-label">代码：</label>
@@ -137,7 +150,7 @@
 
 <script>
 import NavBar from "@/components/NavBar";
-import { NCard, NDivider, NButton, NTabs, NTabPane, NSelect, NDataTable, useMessage, NModal } from 'naive-ui';
+import { NCard, NDivider, NButton, NTabs, NTabPane, NSelect, NDataTable, useMessage, NModal, NSpace } from 'naive-ui';
 import { ref, reactive, h } from 'vue';
 import {useStore} from "vuex";
 import axios from 'axios';
@@ -170,6 +183,10 @@ const createColumns = ({
     {
       title: "Time",
       key: "createTime"
+    },
+    {
+      title: "Language",
+      key: "lang"
     },
     {
       title: "Code",
@@ -252,7 +269,8 @@ export default {
     NSelect,
     VAceEditor,
     NDataTable,
-    NModal
+    NModal,
+    NSpace
   },
   setup() {
     // 设置 代码框
@@ -268,7 +286,8 @@ export default {
       title: "",
       brief: "",
       game: "",
-      code: ""
+      code: "",
+      lang: ""
     });
 
     // 添加bot
@@ -283,7 +302,8 @@ export default {
           title: bot.title,
           brief: bot.brief,
           code: bot.code,
-          game: bot.game
+          game: bot.game,
+          lang: bot.lang
         },
         success(resp) {
           if (resp.error_message === "success") {
@@ -315,6 +335,26 @@ export default {
         label: "Gomoku",
         value: "gomoku"
       },
+    ];
+
+    // 语言选择
+    const langOptions = [
+      {
+        label: "C++",
+        value: "cpp"
+      },
+      {
+        label: "Java",
+        value: "java"
+      },
+      {
+        label: "Python",
+        value: "python"
+      },
+      {
+        label: "Golang",
+        value: "golang"
+      }
     ];
 
     // 展示每个bot代码的模态框
@@ -369,7 +409,32 @@ export default {
       }
     });
 
+    // 跳转到 demo.cpp
+    const toDemoCpp = () => {
+      window.open('/game/gomoku/demo/cpp', '_blank');
+    }
+
+    // 跳转到demo.py
+    const toDemoPython = () => {
+      window.open('/game/gomoku/demo/python', '_blank');
+    }
+
+    // 跳转到demo.go
+    const toDemoGolang = () => {
+      window.open('/game/gomoku/demo/golang', '_blank');
+    }
+
+    // 跳转到demo.java
+    const toDemoJava = () => {
+      window.open('/game/gomoku/demo/java', '_blank');
+    }
+
     return {
+      toDemoJava,
+      toDemoGolang,
+      toDemoPython,
+      toDemoCpp,
+      langOptions,
       records,
       uploadImage,
       fileInput,

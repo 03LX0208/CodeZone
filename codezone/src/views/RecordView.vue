@@ -1,19 +1,21 @@
 <template>
   <div class="content">
     <NavBar/>
-    <div class="row">
-      <div class="col-2"></div>
-      <div class="col-8">
-        <n-data-table
-            :columns="columns"
-            :data="records"
-            :pagination="false"
-            :bordered="false"
-            :single-line="false"
-            style="font-family: si-yuan, sans-serif; font-weight: 750; font-size: 15px;"
-        />
+    <div class="container">
+      <div class="row">
+        <div class="col-2"></div>
+        <div class="col-8">
+          <n-data-table
+              :columns="columns"
+              :data="records"
+              :pagination="false"
+              :bordered="false"
+              :single-line="false"
+              style="font-family: si-yuan, sans-serif; font-weight: 750; font-size: 15px;"
+          />
+        </div>
+        <div class="col-2"></div>
       </div>
-      <div class="col-2"></div>
     </div>
   </div>
 </template>
@@ -76,7 +78,7 @@ export default {
           _records.push({
             game: record.game,
             id: record.id,
-            users: record.ausername + " and " +  record.busername,
+            users: record.ausername + " VS " +  record.busername,
             time: record.time
           });
         }
@@ -103,4 +105,11 @@ export default {
   background-color: rgb(247,248,250);
 }
 
+.col-2 {
+  padding: 0;
+}
+
+.col-8 {
+  padding: 0;
+}
 </style>

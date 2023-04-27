@@ -97,6 +97,8 @@ public class WebSocketServer {
         respA.put("opponent_photo", b.getPhoto());
         respA.put("game", respGame);
         respA.put("my_turn", true);
+        if (botA != null) respA.put("is_bot", true);
+        else respA.put("is_bot", false);
         if (users.get(a.getId()) != null) {
             users.get(a.getId()).sendMessage(respA.toJSONString());
         }
@@ -107,6 +109,8 @@ public class WebSocketServer {
         respB.put("opponent_photo", a.getPhoto());
         respB.put("game", respGame);
         respB.put("my_turn", false);
+        if (botB != null) respB.put("is_bot", true);
+        else respB.put("is_bot", false);
         if (users.get(b.getId()) != null) {
             users.get(b.getId()).sendMessage(respB.toJSONString());
         }

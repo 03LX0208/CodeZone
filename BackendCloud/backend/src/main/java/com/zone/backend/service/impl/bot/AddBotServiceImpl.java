@@ -29,7 +29,7 @@ public class AddBotServiceImpl implements AddBotService {
         UserDetailsImpl loginUser = (UserDetailsImpl) authentication.getPrincipal();
         User user = loginUser.getUser();
 
-        String title = data.get("title"), brief = data.get("brief"), code = data.get("code"), game = data.get("game");
+        String title = data.get("title"), brief = data.get("brief"), code = data.get("code"), game = data.get("game"), lang = data.get("lang");
         if (title == null || title.trim().equals("")) {
             res.put("error_message", "名称不能为空！");
             return res;
@@ -46,6 +46,10 @@ public class AddBotServiceImpl implements AddBotService {
             res.put("error_message", "请选择对应的游戏！");
             return res;
         }
+        if (lang == null || lang.trim().equals("")) {
+            res.put("error_message", "请选择对应的语言！");
+            return res;
+        }
         if (code == null || code.trim().equals("")) {
             res.put("error_message", "代码不能为空！");
             return res;
@@ -56,7 +60,7 @@ public class AddBotServiceImpl implements AddBotService {
         }
 
         Date date = new Date();
-        Bot bot = new Bot(null, user.getId(), game, title, brief, code, date);
+        Bot bot = new Bot(null, user.getId(), game, title, brief, lang, code, date);
         botMapper.insert(bot);
 
         res.put("error_message", "success");

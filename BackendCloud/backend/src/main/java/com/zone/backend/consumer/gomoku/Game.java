@@ -37,18 +37,20 @@ public class Game extends Thread {
         }
 
         Integer botAId = -1, botBId = -1;
-        String botACode = "", botBCode = "";
+        String botACode = "", botBCode = "", botALang = "", botBLang = "";
         if (botA != null) {
             botAId = botA.getId();
             botACode = botA.getCode();
+            botALang = botA.getLang();
         }
         if (botB != null) {
             botBId = botB.getId();
             botBCode = botB.getCode();
+            botBLang = botB.getLang();
         }
 
-        this.playerA = new Player(idA, botAId, botACode, aUsername);
-        this.playerB = new Player(idB, botBId, botBCode, bUsername);
+        this.playerA = new Player(idA, botAId, botALang, botACode, aUsername);
+        this.playerB = new Player(idB, botBId, botBLang, botBCode, bUsername);
         this.steps = new ArrayList<>();
     }
 
@@ -66,8 +68,6 @@ public class Game extends Thread {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-
-        System.out.println(nowStep);
         lock.lock();
         try {
             if (this.g[nowStep.getX()][nowStep.getY()] == 0) {
@@ -100,6 +100,7 @@ public class Game extends Thread {
         MultiValueMap<String, String> data = new LinkedMultiValueMap<>();
         data.add("user_id", player.getUserId().toString());
         data.add("bot_code", player.getBotCode());
+        data.add("lang", player.getLang());
         data.add("input", getInput());
         WebSocketServer.restTemplate.postForObject("http://127.0.0.1:3083/bot/add/", data, String.class);
     }

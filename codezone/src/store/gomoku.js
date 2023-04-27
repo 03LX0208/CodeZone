@@ -10,6 +10,7 @@ export default {
         a_id: 0, // a是黑旗 b是白旗
         b_id: 0,
         my_turn: null, // true表示当前是我的回合
+        is_bot: false, // 是不是bot执行
         gameObject: null,
     },
     getters: {
@@ -36,6 +37,9 @@ export default {
         },
         updateMyTurn(state, turn) {
             state.my_turn = turn;
+        },
+        updateIsBot(state, is_bot) {
+            state.is_bot = is_bot;
         }
     },
     actions: {
